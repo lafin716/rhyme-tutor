@@ -1,0 +1,292 @@
+@import "tailwindcss";
+
+/* Semantic tokens. Components use utilities like bg-surface / text-ink; values switch with the .dark class. */
+@theme inline {
+  --font-sans: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", "맑은 고딕", "Noto Sans KR", system-ui, -apple-system,
+    "Segoe UI", sans-serif;
+  --color-canvas: var(--c-canvas);
+  --color-surface: var(--c-surface);
+  --color-surface-2: var(--c-surface-2);
+  --color-line: var(--c-line);
+  --color-ink: var(--c-ink);
+  --color-ink-2: var(--c-ink-2);
+  --color-ink-3: var(--c-ink-3);
+  --color-accent: var(--c-accent);
+  --color-accent-strong: var(--c-accent-strong);
+  --color-accent-ink: var(--c-accent-ink);
+  --color-accent-soft: var(--c-accent-soft);
+  --color-warn: var(--c-warn);
+  --color-warn-soft: var(--c-warn-soft);
+  --color-danger: var(--c-danger);
+  --color-danger-soft: var(--c-danger-soft);
+  --color-success: var(--c-success);
+  --color-success-soft: var(--c-success-soft);
+  --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.04), 0 10px 30px -18px rgb(0 0 0 / 0.18);
+}
+
+:root {
+  color-scheme: light;
+  --c-canvas: #f6f4ef;
+  --c-surface: #ffffff;
+  --c-surface-2: #f0ede6;
+  --c-line: #e2ddd2;
+  --c-ink: #1e2229;
+  --c-ink-2: #4a5160;
+  --c-ink-3: #5b6270;
+  --c-accent: #2f6f5e;
+  --c-accent-strong: #245a4c;
+  --c-accent-ink: #ffffff;
+  --c-accent-soft: #e1eee8;
+  --c-warn: #8a5300;
+  --c-warn-soft: #fbf1dc;
+  --c-danger: #b42318;
+  --c-danger-soft: #fdecea;
+  --c-success: #2b6e45;
+  --c-success-soft: #e3f2e8;
+}
+
+.dark {
+  color-scheme: dark;
+  --c-canvas: #121417;
+  --c-surface: #1a1d22;
+  --c-surface-2: #22262c;
+  --c-line: #2f343c;
+  --c-ink: #edebe6;
+  --c-ink-2: #b9c0ca;
+  --c-ink-3: #a9b1bd;
+  --c-accent: #7cc7b0;
+  --c-accent-strong: #9adbc8;
+  --c-accent-ink: #0e1a17;
+  --c-accent-soft: #1d3a33;
+  --c-warn: #f2b65c;
+  --c-warn-soft: #3a2c12;
+  --c-danger: #ff8e84;
+  --c-danger-soft: #3d1f1c;
+  --c-success: #7bd39a;
+  --c-success-soft: #17331f;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--c-canvas);
+  color: var(--c-ink);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  word-break: keep-all;
+  overflow: hidden;
+}
+
+:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-line) transparent;
+}
+
+/* Motion */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.fade-in {
+  animation: fade-in 260ms ease-out both;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -240px 0;
+  }
+  100% {
+    background-position: calc(240px + 100%) 0;
+  }
+}
+
+.skeleton {
+  background-color: var(--c-surface-2);
+  background-image: linear-gradient(90deg, transparent, var(--c-line), transparent);
+  background-size: 240px 100%;
+  background-repeat: no-repeat;
+  animation: shimmer 1.4s linear infinite;
+  border-radius: 0.5rem;
+}
+
+@keyframes caret {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.caret::after {
+  content: "";
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 2px;
+  vertical-align: -0.15em;
+  background: currentColor;
+  animation: caret 1s steps(1) infinite;
+}
+
+/* Character avatar (SVG) */
+.av-root {
+  display: block;
+  overflow: visible;
+}
+
+.av-bg {
+  fill: var(--av-bg);
+}
+
+/* Mix toward the surface token, not near-black, so the tile reads as the preset colour instead of a muddy patch. */
+.dark .av-bg {
+  fill: color-mix(in srgb, var(--av-bg) 55%, var(--c-surface-2));
+}
+
+.av-head {
+  transition: transform 0.4s ease;
+}
+
+.av-body {
+  animation: av-breathe 4.2s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+
+.av-happy > .av-figure {
+  animation: av-bounce 1.5s ease-in-out infinite;
+}
+
+.av-eyes {
+  animation: av-blink 5.5s infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.av-mouth {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.av-talking .av-mouth {
+  animation: av-talk 0.34s ease-in-out infinite;
+}
+
+.av-thinking-dots {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.av-thinking .av-thinking-dots {
+  opacity: 1;
+}
+
+.av-thinking-dots circle {
+  animation: av-dot 1.2s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.av-thinking-dots circle:nth-child(2) {
+  animation-delay: 0.18s;
+}
+
+.av-thinking-dots circle:nth-child(3) {
+  animation-delay: 0.36s;
+}
+
+.av-concerned .av-head {
+  transform: rotate(-4deg);
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+
+@keyframes av-breathe {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-1.2px);
+  }
+}
+
+@keyframes av-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes av-blink {
+  0%,
+  90%,
+  100% {
+    transform: scaleY(1);
+  }
+  94% {
+    transform: scaleY(0.1);
+  }
+}
+
+@keyframes av-talk {
+  0%,
+  100% {
+    transform: scaleY(0.55);
+  }
+  50% {
+    transform: scaleY(1.1);
+  }
+}
+
+@keyframes av-dot {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: translateY(0);
+  }
+  45% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-in,
+  .skeleton,
+  .caret::after,
+  .av-root,
+  .av-root * {
+    animation: none !important;
+  }
+  .fade-in {
+    opacity: 1;
+    transform: none;
+  }
+  .av-head {
+    transition: none;
+  }
+}
