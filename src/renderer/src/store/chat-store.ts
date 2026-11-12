@@ -132,17 +132,29 @@ export const useChatStore = create<ChatState>((set, get) => ({
   async retry(tutorMessageId) {
     const courseId = get().courseId
     if (!courseId) return localFailure('NOT_FOUND', '수업 정보를 찾을 수 없어요.')
+    const previous = get().messages.find((m) => m.id === tutorMessageId)
+    // Reset optimistically BEFORE the call. Main may emit 'failed'/'completed' for the retried row before the
+    // invoke resolves (e.g. an instant provider failure); applying the stale "streaming" response after that
+    // event would leave the message stuck in "응답 생성 중".
+    if (previous) {
+      set((s) => ({
+        messages: s.messages.map((m) => (m.id === tutorMessageId ? { ...m, status: 'streaming', content: '' } : m))
+      }))
+    }
     const res = await run(() => window.tutor.chat.retry(tutorMessageId))
     if (get().courseId !== courseId) return res
     if (res.ok) {
-      set((s) => {
-        const existing = s.messages.find((m) => m.id === tutorMessageId)
-        // Only reset a message that is still in a terminal failure state; events may have already advanced it.
-        const reset = !existing || existing.status === 'error' || existing.status === 'cancelled'
-        return { error: null, messages: reset ? upsert(s.messages, res.data.tutorMessage) : s.messages }
-      })
+      // Events own the row from here on; only add it if it is somehow missing.
+      set((s) => ({
+        error: null,
+        messages: s.messages.some((m) => m.id === tutorMessageId) ? s.messages : upsert(s.messages, res.data.tutorMessage)
+      }))
     } else {
-      set({ error: res.error })
+      // Retry was rejected before starting: restore the failed row so its retry button comes back.
+      set((s) => ({
+        error: res.error,
+        messages: previous ? s.messages.map((m) => (m.id === tutorMessageId && m.status === 'streaming' ? previous : m)) : s.messages
+      }))
     }
     return res
   },

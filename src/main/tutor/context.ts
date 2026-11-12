@@ -11,6 +11,11 @@ export const CONTEXT_BUDGET_CHARS = 12_000
 export const MAX_MEMORIES = 10
 export const MAX_MESSAGE_CHARS = 1_500
 export const TRUNCATION_MARK = '…(중략) '
+/**
+ * User turn used when there is no learner message (lesson kickoff, quiz, summary). CLI providers reject an
+ * empty prompt (`claude -p` exits 1: "Input must be provided either through stdin or as a prompt argument").
+ */
+export const TASK_REQUEST_PROMPT = '[요청]\n시스템 지침에 따라 지금 작업을 수행해 주세요.'
 
 export interface ContextMessage {
   seq: number
@@ -82,7 +87,7 @@ export function buildContext(input: ContextInput): BuiltContext {
   let quizStats = input.quizStats
   let messages = [...input.recentMessages]
 
-  const learner = input.learnerText ? `[학습자 메시지]\n${truncateMessage(input.learnerText)}` : ''
+  const learner = input.learnerText ? `[학습자 메시지]\n${truncateMessage(input.learnerText)}` : TASK_REQUEST_PROMPT
 
   const assemble = (): { system: string; prompt: string } => {
     const system = buildCoreSystem({

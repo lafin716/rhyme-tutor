@@ -179,6 +179,8 @@ export function createMockProvider(opts: MockProviderOptions): AIProvider {
       const has = (marker: string): boolean => markersOn && p.includes(marker)
 
       if (req.signal.aborted) throw cancelledError()
+      // Mirror the real CLIs, which exit with an error on an empty stdin prompt.
+      if (p.trim() === '') throw new ProviderError('PROVIDER_FAILED', MESSAGES_KO.failed, 'mock:empty-prompt')
       if (has(MOCK_MARKERS.fail)) throw new ProviderError('PROVIDER_FAILED', MESSAGES_KO.failed, 'mock:fail')
       if (has(MOCK_MARKERS.auth)) {
         throw new ProviderError('PROVIDER_AUTH_REQUIRED', MESSAGES_KO.authRequired, 'mock:auth')

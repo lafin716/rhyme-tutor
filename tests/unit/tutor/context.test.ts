@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { buildTutorCharacter } from '../../../src/main/tutor/character'
-import { buildContext, CONTEXT_BUDGET_CHARS, MAX_MESSAGE_CHARS, truncateMessage, type ContextInput } from '../../../src/main/tutor/context'
+import { buildContext, CONTEXT_BUDGET_CHARS, MAX_MESSAGE_CHARS, TASK_REQUEST_PROMPT, truncateMessage, type ContextInput } from '../../../src/main/tutor/context'
 
 const tutor = buildTutorCharacter('kind-explainer', { id: 'course-1' }, null)
 
@@ -22,6 +22,13 @@ function input(overrides: Partial<ContextInput> = {}): ContextInput {
 }
 
 describe('context builder', () => {
+  it('never produces an empty prompt when there is no learner message (lesson start, quiz, summary)', () => {
+    const built = buildContext(input({ learnerText: null, recentMessages: [] }))
+    expect(built.prompt.trim()).not.toBe('')
+    expect(built.prompt).toContain(TASK_REQUEST_PROMPT)
+    expect(buildContext(input({ learnerText: '질문' })).prompt).not.toContain(TASK_REQUEST_PROMPT)
+  })
+
   it('keeps the learner text only in the prompt, never in the system block', () => {
     const secret = '비밀 질문 XYZ123'
     const built = buildContext(input({ learnerText: secret }))
