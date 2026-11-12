@@ -11,6 +11,7 @@ import { CreateCoursePage } from './pages/CreateCoursePage'
 import { ClassroomPage } from './pages/ClassroomPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { Toaster } from './components/Toaster'
+import { TitleBar } from './components/TitleBar'
 import { useTutorSubscriptions } from './lib/subscriptions'
 
 function RouteView({ route }: { route: Route }) {
@@ -52,13 +53,13 @@ export function App() {
 
   useTutorSubscriptions(phase === 'ready')
 
-  if (phase === 'booting') return <BootScreen />
-  if (phase === 'fatal') return <FatalScreen />
-
   return (
-    <>
-      <RouteView route={route} />
-      <Toaster />
-    </>
+    <div className="flex h-full flex-col">
+      <TitleBar tone={phase === 'ready' ? 'surface' : 'canvas'} />
+      <div className="min-h-0 flex-1">
+        {phase === 'booting' ? <BootScreen /> : phase === 'fatal' ? <FatalScreen /> : <RouteView route={route} />}
+      </div>
+      {phase === 'ready' && <Toaster />}
+    </div>
   )
 }

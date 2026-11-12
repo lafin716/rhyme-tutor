@@ -2,7 +2,7 @@ import { app, BrowserWindow, dialog, ipcMain, session, shell, type WebContents }
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import type { ChatStreamEvent } from '@shared/domain'
-import { EVENTS, type CourseEvent, type JobEvent } from '@shared/ipc'
+import { EVENTS, type CourseEvent, type JobEvent, type WindowStateEvent } from '@shared/ipc'
 import { openDatabase, DbVersionTooNewError, MigrationError } from './db/connection'
 import type { Db } from './db/util'
 import { AiSlot } from './ai-slot'
@@ -12,7 +12,7 @@ import { createFileLogger } from './log/logger'
 import { JobRunner, type RecoverySummary } from './jobs/runner'
 import { LearningService } from './learning/service'
 import { TutorOrchestrator } from './tutor/orchestrator'
-import { createHandlers } from './ipc/handlers'
+import { createHandlers, type WindowControls } from './ipc/handlers'
 import { registerIpc, type IpcInvokeEventLike } from './ipc/register'
 
 const DB_FILE_NAME = 'tutor.db'
@@ -63,9 +63,16 @@ function hardenWindow(win: BrowserWindow): void {
 }
 
 function createWindow(): BrowserWindow {
+  const isMac = process.platform === 'darwin'
   const win = new BrowserWindow({
     width: 1280,
     height: 820,
+    minWidth: 720,
+    minHeight: 520,
+    // Seamless UI: no native title bar / menu bar. Windows & Linux draw their own min/max/close in the renderer
+    // (TitleBar.tsx); macOS keeps the native traffic lights inset into the app's title bar area.
+    ...(isMac ? { titleBarStyle: 'hidden' as const, trafficLightPosition: { x: 14, y: 12 } } : { frame: false }),
+    show: false,
     webPreferences: {
       preload: PRELOAD,
       contextIsolation: true,
@@ -74,6 +81,12 @@ function createWindow(): BrowserWindow {
     }
   })
   hardenWindow(win)
+  win.once('ready-to-show', () => win.show())
+  const pushState = (): void => sendTo(win.webContents, EVENTS.windowState, windowState(win))
+  win.on('maximize', pushState)
+  win.on('unmaximize', pushState)
+  win.on('enter-full-screen', pushState)
+  win.on('leave-full-screen', pushState)
   const dev = process.env['ELECTRON_RENDERER_URL']
   if (dev) void win.loadURL(dev)
   else void win.loadFile(INDEX_HTML)
@@ -81,6 +94,25 @@ function createWindow(): BrowserWindow {
     if (mainWindow === win) mainWindow = null
   })
   return win
+}
+
+function windowState(win: BrowserWindow): WindowStateEvent {
+  return { maximized: win.isMaximized(), fullScreen: win.isFullScreen() }
+}
+
+/** Title bar controls always act on the main window (there is only one). */
+const windowControls: WindowControls = {
+  minimize: () => mainWindow?.minimize(),
+  toggleMaximize: () => {
+    const win = mainWindow
+    if (!win) return false
+    if (win.isFullScreen()) win.setFullScreen(false)
+    else if (win.isMaximized()) win.unmaximize()
+    else win.maximize()
+    return win.isMaximized()
+  },
+  close: () => mainWindow?.close(),
+  state: () => (mainWindow ? windowState(mainWindow) : { maximized: false, fullScreen: false })
 }
 
 function sendTo(webContents: WebContents | undefined, channel: string, payload: unknown): void {
@@ -191,6 +223,7 @@ async function main(): Promise<void> {
           : await dialog.showSaveDialog({ defaultPath: defaultName, filters: [{ name: 'JSON', extensions: ['json'] }] })
         return result.canceled || !result.filePath ? null : result.filePath
       },
+      window: windowControls,
       now: () => new Date().toISOString(),
       log: logger
     }),

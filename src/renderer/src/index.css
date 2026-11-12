@@ -290,3 +290,14 @@ body {
     transition: none;
   }
 }
+
+/* Frameless window: the title bar and page headers move the window. Interactive children stay clickable. */
+.app-drag {
+  -webkit-app-region: drag;
+  app-region: drag;
+}
+
+.app-drag :is(button, a, input, select, textarea, label, summary, [role="button"], [tabindex]) {
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+}

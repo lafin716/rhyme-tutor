@@ -65,19 +65,28 @@ export const IPC = {
   quizAnswer: 'quiz:answer',
   quizFlag: 'quiz:flag',
 
-  jobsList: 'jobs:list'
+  jobsList: 'jobs:list',
+
+  windowMinimize: 'window:minimize',
+  windowToggleMaximize: 'window:toggleMaximize',
+  windowClose: 'window:close',
+  windowState: 'window:getState'
 } as const
 
 /** Main -> renderer push channels. */
 export const EVENTS = {
   chat: 'chat:event',
   jobs: 'jobs:event',
-  courses: 'courses:event'
+  courses: 'courses:event',
+  windowState: 'window:state'
 } as const
 
 export type JobEvent = { type: 'job'; job: BackgroundJob }
 /** Emitted when course/curriculum data changed in background (e.g. curriculum generated). */
 export type CourseEvent = { type: 'course-updated'; courseId: string } | { type: 'course-deleted'; courseId: string }
+
+/** Main-window state for the frameless in-app title bar. Pushed on maximize/restore and full-screen changes. */
+export type WindowStateEvent = { maximized: boolean; fullScreen: boolean }
 
 export type Unsubscribe = () => void
 
@@ -147,9 +156,20 @@ export interface TutorApi {
   jobs: {
     list(courseId: string | null): Promise<Result<BackgroundJob[]>>
   }
+  /** Frameless window controls for the in-app title bar. Always acts on the main window. */
+  window: {
+    /** Host `process.platform` ('darwin' | 'win32' | 'linux' ...). Synchronous, available before bootstrap. */
+    platform: string
+    minimize(): Promise<Result<null>>
+    /** Maximizes, or restores when already maximized. Resolves with the new maximized state. */
+    toggleMaximize(): Promise<Result<boolean>>
+    close(): Promise<Result<null>>
+    state(): Promise<Result<WindowStateEvent>>
+  }
   on: {
     chat(listener: (event: ChatStreamEvent) => void): Unsubscribe
     jobs(listener: (event: JobEvent) => void): Unsubscribe
     courses(listener: (event: CourseEvent) => void): Unsubscribe
+    windowState(listener: (event: WindowStateEvent) => void): Unsubscribe
   }
 }

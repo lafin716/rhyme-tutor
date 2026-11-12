@@ -40,6 +40,7 @@ markers need `TUTOR_ENABLE_MOCK=1`). Implemented.
 | External links | opening external http(s) URLs through `shell.openExternal` | Planned. `shell` is used in main only for `openPath` (export folder) |
 | CSP | `src/renderer/index.html` meta tag: `default-src 'self'`, `connect-src 'self'`, no remote scripts. `frame-ancestors` has no effect when delivered via meta | Implemented (see SECURITY.md) |
 | IPC sender check | `isTrustedSender` checks the sender frame URL | Implemented |
+| Frameless window (seamless UI) | Windows/Linux `frame: false`, macOS `titleBarStyle: 'hidden'` (native traffic lights). In-app `TitleBar.tsx` draws min/max/close via `window:*` IPC (same sender check, acts only on the main window); `.app-drag` CSS marks title bar and page headers as drag regions | Implemented (E2E `g-titlebar` on Windows; macOS not visually verified) |
 | All IPC inputs validated | Zod schemas in `src/shared/domain.ts`, parsed in main before use | Implemented |
 | CLI execution only in `src/main/providers/*` | `spawn(file, staticArgs, { shell:false })`. User text goes via **stdin** only, never argv or a shell string | Implemented |
 | Executable resolution | search `PATH` (+ well-known install dirs) for `claude`/`codex`; must be an absolute, existing, regular file. Windows prefers `.exe`; `.cmd`/`.bat` run through ComSpec with restricted argv | Implemented (Windows run unverified) |

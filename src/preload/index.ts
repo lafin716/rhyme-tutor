@@ -3,7 +3,7 @@
  * Arguments are passed through unchanged: main re-validates everything with Zod and always answers with a Result.
  */
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
-import { EVENTS, IPC, type CourseEvent, type JobEvent, type TutorApi, type Unsubscribe } from '@shared/ipc'
+import { EVENTS, IPC, type CourseEvent, type JobEvent, type TutorApi, type WindowStateEvent, type Unsubscribe } from '@shared/ipc'
 
 type ChatListener = Parameters<TutorApi['on']['chat']>[0]
 type ChatEvent = Parameters<ChatListener>[0]
@@ -71,10 +71,18 @@ const api: TutorApi = {
   jobs: {
     list: (courseId) => invoke(IPC.jobsList, courseId)
   },
+  window: {
+    platform: process.platform,
+    minimize: () => invoke(IPC.windowMinimize),
+    toggleMaximize: () => invoke(IPC.windowToggleMaximize),
+    close: () => invoke(IPC.windowClose),
+    state: () => invoke(IPC.windowState)
+  },
   on: {
     chat: (listener) => subscribe<ChatEvent>(EVENTS.chat, listener),
     jobs: (listener) => subscribe<JobEvent>(EVENTS.jobs, listener),
-    courses: (listener) => subscribe<CourseEvent>(EVENTS.courses, listener)
+    courses: (listener) => subscribe<CourseEvent>(EVENTS.courses, listener),
+    windowState: (listener) => subscribe<WindowStateEvent>(EVENTS.windowState, listener)
   }
 }
 

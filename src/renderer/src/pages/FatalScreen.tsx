@@ -8,7 +8,7 @@ export function FatalScreen() {
   return (
     <main
       data-testid="fatal-screen"
-      className="flex min-h-screen flex-col items-center justify-center gap-5 bg-canvas p-6 text-ink"
+      className="flex h-full flex-col items-center justify-center gap-5 bg-canvas p-6 text-ink"
     >
       <h1 className="text-xl font-semibold">앱을 시작하지 못했어요</h1>
       <p className="max-w-md text-center text-sm text-ink-2">

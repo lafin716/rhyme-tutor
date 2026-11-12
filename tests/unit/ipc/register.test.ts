@@ -48,6 +48,12 @@ function wire(isTrusted: (e: IpcInvokeEventLike) => boolean) {
     emitCourse: () => undefined,
     openDataDir: async () => undefined,
     chooseExportPath: async () => null,
+    window: {
+      minimize: () => undefined,
+      toggleMaximize: () => true,
+      close: () => undefined,
+      state: () => ({ maximized: false, fullScreen: false })
+    },
     now: () => new Date().toISOString(),
     log: noopLog
   })

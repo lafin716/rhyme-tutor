@@ -15,7 +15,7 @@ import {
   type ProviderId,
   type Result
 } from '@shared/domain'
-import { IPC, type CourseEvent } from '@shared/ipc'
+import { IPC, type CourseEvent, type WindowStateEvent } from '@shared/ipc'
 import type { Db } from '../db/util'
 import { RepoError } from '../db/util'
 import { getProfile, getSettings, updateSettings, saveProfile } from '../db/repo-core'
@@ -38,6 +38,15 @@ export const CHAT_HISTORY_MAX_LIMIT = 100
 export type IpcChannelName = (typeof IPC)[keyof typeof IPC]
 export type HandlerFn = (...args: unknown[]) => unknown
 
+/** Main-window operations for the frameless title bar. Kept abstract so tests need no BrowserWindow. */
+export interface WindowControls {
+  minimize(): void
+  /** Returns the new maximized state. */
+  toggleMaximize(): boolean
+  close(): void
+  state(): WindowStateEvent
+}
+
 export interface IpcDeps {
   db: Db
   learning: LearningService
@@ -56,6 +65,8 @@ export interface IpcDeps {
   openDataDir: () => Promise<void>
   /** Shows the native save dialog. Resolves null when cancelled. */
   chooseExportPath: (defaultName: string) => Promise<string | null>
+  /** Frameless title bar controls (main window). */
+  window: WindowControls
   now: () => string
   log: ProviderLogger
 }
@@ -189,7 +200,18 @@ export function createHandlers(deps: IpcDeps): Record<IpcChannelName, HandlerFn>
     [IPC.quizAnswer]: (input: unknown) => learning.answerQuiz(parse(AnswerQuizInputSchema, input)),
     [IPC.quizFlag]: (input: unknown) => learning.flagQuiz(parse(FlagQuizInputSchema, input)),
 
-    [IPC.jobsList]: (courseId: unknown) => learning.jobs(parse(NullableIdSchema, courseId))
+    [IPC.jobsList]: (courseId: unknown) => learning.jobs(parse(NullableIdSchema, courseId)),
+
+    [IPC.windowMinimize]: () => {
+      deps.window.minimize()
+      return null
+    },
+    [IPC.windowToggleMaximize]: () => deps.window.toggleMaximize(),
+    [IPC.windowClose]: () => {
+      deps.window.close()
+      return null
+    },
+    [IPC.windowState]: () => deps.window.state()
   }
 }
 

@@ -28,7 +28,7 @@ export function Toaster() {
       data-testid="toast"
       data-tone={toast.tone}
       className={cx(
-        'fade-in fixed right-4 top-16 z-50 flex max-w-sm items-start gap-3 rounded-xl px-4 py-2.5 text-sm font-medium shadow-soft',
+        'fade-in fixed right-4 top-24 z-50 flex max-w-sm items-start gap-3 rounded-xl px-4 py-2.5 text-sm font-medium shadow-soft',
         isError ? 'bg-danger text-white dark:text-[#2a0907]' : 'bg-ink text-canvas'
       )}
     >

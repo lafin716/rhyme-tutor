@@ -55,7 +55,7 @@ export function ClassroomPage({ courseId }: ClassroomPageProps) {
   }, [courseId, load, clear])
 
   const header = (
-    <header className="flex shrink-0 items-center gap-2 border-b border-line bg-surface px-4 py-3">
+    <header className="app-drag flex shrink-0 items-center gap-2 border-b border-line bg-surface px-4 pb-3 pt-1">
       <IconButton label="뒤로" icon="chevron-left" onClick={() => navigate({ name: 'dashboard' })} data-testid="back-button" />
       <h1 className="min-w-0 flex-1 truncate text-lg font-semibold text-ink" data-testid="classroom-title">
         {snapshot?.course.title ?? '수업'}
