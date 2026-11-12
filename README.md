@@ -123,8 +123,8 @@ TUTOR_ENABLE_MOCK=1 npm run dev
 
 [PROGRESS.md](PROGRESS.md)의 Known Issues를 요약합니다.
 
-- **서명 없음**: 빌드가 서명·공증되지 않았고 기본 아이콘을 씁니다.
-- **Windows 미검증**: Windows 패키지는 빌드만 확인했습니다. 실행, `.cmd` CLI 탐지와 인자 처리는 실기 검증이 필요합니다.
+- **서명 없음**: 빌드가 서명·공증되지 않았고 기본 아이콘을 씁니다. 서명 절차는 [docs/RELEASING.md](docs/RELEASING.md)에 있습니다.
+- **Windows 실기 실행 없음**: Windows 패키지는 빌드만 확인했고, 이 항목은 사용자 결정으로 해결 처리했습니다. 문제가 생기면 이슈로 알려 주세요.
 - **Codex 샌드박스**: `-s read-only`는 쓰기만 막습니다. 사용자가 읽을 수 있는 파일은 Codex가 읽을 수 있습니다 (작업 디렉터리는 앱 임시 폴더로 고정). Claude Code는 `--tools ""`로 도구를 끕니다.
 - **CSP와 frame-ancestors**: 렌더러 CSP는 `<meta>`로 전달되므로 `frame-ancestors`는 적용되지 않습니다. 다른 지시문은 적용됩니다.
 - **번들 크기**: 렌더러 번들이 약 1.49 MB이며 코드 분할은 아직 없습니다.
@@ -154,6 +154,7 @@ TUTOR_ENABLE_MOCK=1 npm run dev
 | [docs/SECURITY.md](docs/SECURITY.md) | 보안 경계와 개인정보 |
 | [docs/TEST_PLAN.md](docs/TEST_PLAN.md) | 검증 계획 |
 | [docs/DECISIONS.md](docs/DECISIONS.md) | 설계 결정 기록 (ADR)과 열린 항목 |
+| [docs/RELEASING.md](docs/RELEASING.md) | 릴리스와 코드 서명 |
 
 진행 상황은 [PROGRESS.md](PROGRESS.md)를 보세요.
 

@@ -57,6 +57,7 @@
 - **상황**: CLI 구독을 제3자 앱에서 자동 호출하는 것이 제공사 약관상 허용되는지 불명확할 수 있다.
 - **결정**: CLI 구독 경로를 `experimental`로 분류한다. 배포 기본 경로로 내세우지 않는다. 공식 API 경로(Anthropic API, OpenAI API)는 2차 Planned로 두고 키는 OS 보안 저장소에 둔다.
 - **규칙**: 릴리스 전 제공사 약관을 재확인하고 결과를 이 문서에 날짜와 함께 추가한다. 조항 번호는 확인 전까지 인용하지 않는다.
+- **기록 (v0.1.0)**: 사용자 결정으로 해결 처리 (2026-11-12, v0.1.0 릴리스 시점). 약관 원문 대조는 수행하지 않았다. 다음 릴리스 전 재확인한다.
 - **결과**: 실험적 어댑터는 설정으로 비활성화할 수 있어야 한다 (ROADMAP 2차 정책 항목과 연결).
 
 ## ADR-005 Mock Provider와 실패 마커
@@ -131,7 +132,7 @@
 | e | `learning_summaries.covered_until_seq`가 DB에는 있으나 TS 타입에 없음. `messages.seq`, `background_jobs.payload_json`도 TS 타입 누락 | DATA_MODEL 12절 | **Resolved (1차 범위 결정, 2026-11-11)**. 결정: 1차 공개 계약(`src/shared/domain.ts`)에 `seq`, `payload_json`, `coveredUntilSeq`를 추가하지 않는다. 순서와 요약 경계는 저장소 내부(`repo-*.ts`)에서만 쓰며 Renderer에 노출하지 않는다. 계약에 노출하려면 리더 승인이 필요하다 (2차 후보). |
 | f | AI 세션 ID와 제공사 세션 ID 구분. 현재 설계에 제공사 세션 없음 | ADR-003 | Open (명시 완료) |
 | g | Node 24 `node:sqlite` 안정성과 ExperimentalWarning 미검증 | ADR-002 | Open (trade-off 기록) |
-| h | Windows 패키지의 실행 검증은 Windows 호스트 필요 | MVP_SCOPE D-8 | Open |
+| h | Windows 패키지의 실행 검증은 Windows 호스트 필요 | MVP_SCOPE D-8 | **Resolved (사용자 결정으로 해결 처리 (2026-11-12, v0.1.0 릴리스 시점))**. Windows 실기 실행은 수행하지 않았다. 문제 보고 시 재검증한다. |
 | i | "다음 날 학습 재개"는 `currentLessonId`, `lastStudiedAt`, 요약으로 구현 | TUTOR_ENGINE 8절 | Open (설계 확정 제안) |
 | j | `learning_memories.source`에 `self_report` 값 없음. self_report 근거 기억 생성 불가 | DATA_MODEL 12절 | **Resolved (1차 제외, 2026-11-11)**. 결정: 1차 기억(`learning_memories`)의 source는 `summary`와 `quiz`만 쓴다. 자기 점검 근거는 `objective_evidence`에 그대로 남으므로 목표 상태에는 영향이 없다. `self_report` 기억을 허용하려면 새 마이그레이션(v2, append-only)과 리더 승인이 필요하다 (2차 후보). |
 | k | 일부 FK 누락 (`courses.current_lesson_id`, `messages.lesson_id`, `messages.reply_to`, `learning_summaries.lesson_id`, `learning_summaries.covered_until_message_id`) | DATA_MODEL 4.15 | **Resolved (1차 유지, 2026-11-11)**. 결정: 1차 마이그레이션 v1은 수정하지 않는다 (append-only). 참조 무결성은 쓰기 경로의 코스 소속 확인과 트랜잭션에 의존한다. FK 추가는 마이그레이션 v2로 2차에 리더 승인 후 진행한다. |

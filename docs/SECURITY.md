@@ -215,4 +215,4 @@ codex exec --json --skip-git-repo-check --ephemeral -s read-only -C <scratch> [-
 | S-6 | 외부 네비게이션 차단 | E2E 또는 수동 |
 | S-7 | 패키지에 `.env`, 테스트 DB 없음 | 패키지 내용 목록 확인 |
 | S-8 | 의존성 취약점 검토 | `npm audit` 실행 여부와 결과를 PROGRESS에 기록 |
-| S-9 | Windows `.cmd` 감지와 인용 | Windows 호스트에서 실행 (PKG-02) |
+| S-9 | Windows `.cmd` 감지와 인용 | Windows 호스트에서 실행 (PKG-02). **사용자 결정으로 해결 처리 (2026-11-12, v0.1.0 릴리스 시점)**, 실기 실행 없음 (REV-01 분석상 인용 안전) |

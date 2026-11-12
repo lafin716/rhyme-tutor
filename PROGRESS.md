@@ -1,7 +1,7 @@
 # Project Progress
 
 Last Updated: 2026-11-12
-Overall Progress: 99.25%
+Overall Progress: 99.75%
 
 ## Status
 - TODO
@@ -20,7 +20,7 @@ Overall Progress: 99.25%
 | FE Renderer | 25 | 100% | DONE | frontend-agent |
 | INT Integration & Review | 10 | 100% | DONE | leader, reviewer |
 | QA Testing & UI Review | 15 | 100% | DONE | leader, reviewer |
-| PKG Packaging | 5 | 85% | BLOCKED | leader |
+| PKG Packaging | 5 | 95% | BLOCKED | leader |
 
 ## Tasks
 
@@ -42,14 +42,15 @@ Overall Progress: 99.25%
 | QA-02 | QA Testing & UI Review | Real app screenshots (multi-size, light/dark), independent UI review, fixes | leader, reviewer | MEDIUM | opus (inherited) | medium | DONE | 100% | INT-01 | 22 shots (artifacts/screens, 1024/1280/1600 × light/dark); review 4 P1/7 P2/6 P3 → fixed by frontend-agent; independent re-review: 0 new P1, 0 blocking P2; P1-1 (pre-submit quiz colour) rejected by design (answer key not exposed before answering); toast top-right visible; leader checked dark .av-bg tile |
 | QA-03 | QA Testing & UI Review | Real CLI smoke (Claude Code, Codex) + performance measurements | leader | MEDIUM | opus (inherited) | medium | DONE | 100% | INT-01 | Real smoke 2/2 (claude 2.1.322 ~2.5s, codex 0.164.0 ~5.5s, AI latency). Local perf (tests/perf, Mock 5ms, M1 Pro/macOS 26.1, n=5 median): restart→dashboard 520ms, dashboard→classroom 29ms, chat round trip 107ms. Recorded in docs/TEST_STRATEGY.md (Performance) |
 | PKG-01 | PKG Packaging | macOS package (--dir) and launch smoke | leader | MEDIUM | opus (inherited) | medium | DONE | 100% | INT-01 | PASS: dist/mac-arm64/Rhyme Tutor.app (unsigned, default icon) launched with temp userData: migration 1 + job recovery OK; rebuilt after REV-01/QA-02 fixes and re-smoked OK (2026-11-11) |
-| PKG-02 | PKG Packaging | Windows x64 package build + run verification | leader | MEDIUM | opus (inherited) | medium | BLOCKED | 70% | INT-01 | BUILD PASS: dist/Rhyme Tutor Setup 0.1.0.exe (NSIS x64, unsigned) + win.zip cross-built on macOS. RUN UNVERIFIED: no Windows host (resume: install + launch + Mock flow + .cmd CLI detection on Windows) |
+| PKG-02 | PKG Packaging | Windows x64 package build + run verification | leader | MEDIUM | opus (inherited) | medium | DONE | 100% | INT-01 | BUILD PASS: NSIS x64 setup + win.zip cross-built on macOS. 사용자 결정으로 해결 처리 (2026-11-12, v0.1.0 릴리스 시점); Windows run not performed |
+| PKG-03 | PKG Packaging | Code signing (macOS Developer ID + notarization, Windows Authenticode) | leader, user | MEDIUM | opus (inherited) | medium | BLOCKED | 50% | PKG-01, PKG-02 | CONFIG DONE: electron-builder.yml (mac dmg+zip, hardenedRuntime, env-only credentials), release:mac/release:win scripts, docs/RELEASING.md; unsigned dmg+zip build PASS. SIGNING BLOCKED: no Developer ID / Windows certificate on this machine (resume: follow docs/RELEASING.md) |
 | DOC-02 | DOC Documentation | Sync docs with implementation, final report | docs-agent, leader | LOW | opus (inherited) | medium | DONE | 100% | QA-01, QA-02, PKG-01 | Docs swept for stale Unverified/label/regex statements (resume button "이어서 수업하기" Verified E2E; ADR-002 Accepted; SECURITY §4.4 unified regex); final report delivered |
 
 ## Active Work
-- None. All agents DONE. Only PKG-02 (Windows run) remains, BLOCKED on a Windows host.
+- None. All agents DONE. Only PKG-03 (code signing) remains, waiting for the user's certificates.
 
 ## Blockers
-- PKG-02: Windows run verification needs a Windows host (installer built, unverified).
+- PKG-03: signing needs an Apple Developer ID certificate + notarization key and a Windows code signing certificate (docs/RELEASING.md).
 
 ## Decisions
 - `node:sqlite` (built into Electron 45 / Node 24) + hand-written repositories instead of native better-sqlite3 + Drizzle (no ABI rebuild; see docs/DECISIONS.md).
@@ -66,9 +67,11 @@ Overall Progress: 99.25%
 - REV-01 follow-up (reviewer): regex unification is safe on the Windows cmd path ([ ] literal; & | < > ^ % ! and " blocked); a stored leading-dash alias now resets only that key (per-key repair, tests/unit/db/settings.test.ts).
 - Final+1 (2026-11-12, after settings per-key repair): eslint 0, typecheck 0, vitest 22 files/209 pass/2 skipped, build OK, E2E 8/8 (1.6m), macOS package rebuilt + launch smoke OK (migration 1 applied, recovery complete, 0 error lines).
 
+- Release v0.1.0 (2026-11-12): AGPL-3.0-only license added; typecheck 0, lint 0, vitest 209 pass/2 skipped, E2E 8/8; mac (dmg+zip) and win (nsis+zip) built unsigned.
+
 ## Known Issues
-- Builds are unsigned and use the default Electron icon (macOS Gatekeeper / Windows SmartScreen warnings).
-- Windows run, `.cmd` CLI quoting and detection unverified on a real Windows host (PKG-02 BLOCKED).
+- Builds are unsigned until PKG-03 is done, and use the default Electron icon (macOS Gatekeeper / Windows SmartScreen warnings).
+- Windows run and provider terms re-check: 사용자 결정으로 해결 처리 (2026-11-12, v0.1.0 릴리스 시점); not executed on a real Windows host / against terms text.
 - Codex `-s read-only` sandbox can still read any file the user can read (scratch cwd sets the working root only); Claude runs with `--tools ""`.
 - CSP is delivered via meta tag, so `frame-ancestors` has no effect (other directives honoured).
 - Renderer bundle 1.49 MB (no code-splitting yet).

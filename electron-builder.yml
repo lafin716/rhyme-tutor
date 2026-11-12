@@ -7,17 +7,29 @@ files:
   - out/**
   - package.json
 asar: true
+# Code signing reads credentials from environment variables only (see docs/RELEASING.md).
+# Without them the build still succeeds, unsigned.
 mac:
-  target: [dir]
+  target:
+    - target: dmg
+      arch: [arm64]
+    - target: zip
+      arch: [arm64]
   category: public.app-category.education
+  hardenedRuntime: true
+  artifactName: Rhyme-Tutor-${version}-mac-${arch}.${ext}
+dmg:
+  artifactName: Rhyme-Tutor-${version}-mac-${arch}.${ext}
 win:
   target:
     - target: nsis
       arch: [x64]
     - target: zip
       arch: [x64]
+  artifactName: Rhyme-Tutor-${version}-win.${ext}
 nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true
+  artifactName: Rhyme-Tutor-Setup-${version}.${ext}
 linux:
   target: [AppImage]
