@@ -159,4 +159,6 @@ TUTOR_ENABLE_MOCK=1 npm run dev
 
 ## 라이선스
 
-_미정_ (`package.json`의 `license`는 `UNLICENSED`)
+[GNU Affero General Public License v3.0](LICENSE) (`AGPL-3.0-only`).
+
+이 앱을 수정해 배포하거나, 수정본을 네트워크 서비스로 제공하면 수정한 소스 코드도 같은 라이선스로 공개해야 합니다.
